@@ -1,0 +1,67 @@
+/*
+ * Lucian UX/UI Prompt · MIT License (c) 2026 Seokwoooo
+ * https://lucianlabs.dev/uxui-prompt/
+ *
+ * Ported elements, mapped to the Total Automotriz theme tokens:
+ *   #039 Sliding pill tabs        → src/components/catalog/CategoryTabs.jsx
+ *   #044 FAQ accordion            → src/components/catalog/FiltersPanel.jsx
+ *   #019 Interest chips           → src/components/catalog/FuelFilter.jsx
+ *   #079 Skeleton bloom           → src/components/feedback/CatalogSkeleton.jsx
+ *   #092 Empty search             → src/components/feedback/EmptyState.jsx
+ *   #090 Error widget             → src/components/feedback/ErrorState.jsx
+ *   #091 Offline banner           → src/components/feedback/DataNotice.jsx
+ */
+
+/* Shared plus/minus control from #044. */
+.filter-plus {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--surface-2);
+  transition:
+    background-color 0.35s var(--ease),
+    transform 0.45s var(--spring);
+}
+
+.filter-plus::before,
+.filter-plus::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 11px;
+  height: 2px;
+  margin: -1px 0 0 -5.5px;
+  border-radius: 2px;
+  background: var(--ink);
+  transition:
+    transform 0.5s var(--spring),
+    background-color 0.3s var(--ease);
+}
+
+.filter-plus::after {
+  transform: rotate(90deg);
+}
+
+button:hover > .filter-plus {
+  transform: scale(1.08);
+}
+
+button:active > .filter-plus {
+  transform: scale(0.92);
+}
+
+[aria-expanded='true'] > .filter-plus {
+  background: var(--ink);
+}
+
+[aria-expanded='true'] > .filter-plus::before,
+[aria-expanded='true'] > .filter-plus::after {
+  background: var(--bg);
+}
+
+[aria-expanded='true'] > .filter-plus::after {
+  transform: rotate(180deg);
+}

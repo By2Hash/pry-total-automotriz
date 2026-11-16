@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es-AR">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/pwa-192x192.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="color-scheme" content="light dark" />
+    <meta
+      name="description"
+      content="Catálogo de autos, utilitarios, motos y maquinaria de Total Automotriz en Córdoba. Consultá disponibilidad y precio por WhatsApp."
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Total Automotriz" />
+    <title>Total Automotriz | Catálogo de vehículos en Córdoba</title>
+    <script>
+      ;(() => {
+        try {
+          const stored = localStorage.getItem('total-automotriz:theme')
+          const theme =
+            stored === 'light' || stored === 'dark'
+              ? stored
+              : window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light'
+          document.documentElement.dataset.theme = theme
+          document
+            .querySelector('meta[name="theme-color"]')
+            ?.setAttribute('content', theme === 'dark' ? '#0c0c0e' : '#ffffff')
+        } catch {
+          document.documentElement.dataset.theme = 'light'
+        }
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
