@@ -82,6 +82,32 @@ export default defineConfig(({ mode }) => {
                 cacheableResponse: { statuses: [0, 200] },
               },
             },
+            {
+              urlPattern: /\/fotos\/manifest\.json$/,
+              handler: 'NetworkFirst',
+              options: {
+                cacheName: 'total-automotriz-fotos-manifest',
+                networkTimeoutSeconds: 5,
+                expiration: {
+                  maxEntries: 1,
+                  maxAgeSeconds: 60 * 60 * 24 * 7,
+                },
+                cacheableResponse: { statuses: [0, 200] },
+              },
+            },
+            {
+              urlPattern: /\/fotos\/.+\.webp$/,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'total-automotriz-fotos',
+                expiration: {
+                  maxEntries: 400,
+                  maxAgeSeconds: 60 * 60 * 24 * 60,
+                  purgeOnQuotaError: true,
+                },
+                cacheableResponse: { statuses: [0, 200] },
+              },
+            },
           ],
         },
       }),

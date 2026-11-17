@@ -3,7 +3,9 @@ import { FaWhatsapp } from 'react-icons/fa6'
 import { pluralize } from '../../lib/format'
 import { generalWhatsAppUrl } from '../../lib/whatsapp'
 import { useCatalogFilters } from '../../hooks/useCatalogFilters'
+import { useFotos } from '../../hooks/useFotos'
 import { useVehiculos } from '../../hooks/useVehiculos'
+import { getVehiclePhotos } from '../../lib/media'
 import { CatalogSkeleton } from '../feedback/CatalogSkeleton'
 import { DataNotice } from '../feedback/DataNotice'
 import { EmptyState } from '../feedback/EmptyState'
@@ -14,6 +16,7 @@ import { FilterToggle } from './FilterToggle'
 import { FiltersPanel } from './FiltersPanel'
 import { SearchBar } from './SearchBar'
 import { SortSelect } from './SortSelect'
+import { VehicleDetail } from './VehicleDetail'
 import { VehicleGrid } from './VehicleGrid'
 
 export function CatalogPage() {
@@ -56,7 +59,9 @@ export function CatalogPage() {
     suggestions,
   } = useCatalogFilters(vehicles)
 
+  const fotos = useFotos()
   const [filtersOpen, setFiltersOpen] = useState(false)
+  const [selectedVehicle, setSelectedVehicle] = useState(null)
 
   const countText =
     status === 'loading'
@@ -175,7 +180,11 @@ export function CatalogPage() {
                 onClear={clearAll}
               />
             ) : (
-              <VehicleGrid vehicles={filteredVehicles} />
+              <VehicleGrid
+                vehicles={filteredVehicles}
+                photosById={fotos}
+                onOpen={setSelectedVehicle}
+              />
             ))}
         </section>
       </div>
@@ -205,6 +214,15 @@ export function CatalogPage() {
           )}
         </div>
       </section>
+
+      {selectedVehicle && (
+        <VehicleDetail
+          key={selectedVehicle.id}
+          vehicle={selectedVehicle}
+          photos={getVehiclePhotos(selectedVehicle, fotos)}
+          onClose={() => setSelectedVehicle(null)}
+        />
+      )}
     </main>
   )
 }

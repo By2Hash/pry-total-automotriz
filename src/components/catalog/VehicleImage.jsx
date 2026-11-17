@@ -2,8 +2,11 @@ import { useMemo, useState } from 'react'
 import { FaCarSide } from 'react-icons/fa6'
 import { getPhotoCandidates } from '../../lib/media'
 
-export function VehicleImage({ vehicle }) {
-  const candidates = useMemo(() => getPhotoCandidates(vehicle), [vehicle])
+export function VehicleImage({ vehicle, photos = [] }) {
+  const candidates = useMemo(
+    () => getPhotoCandidates(vehicle, photos),
+    [vehicle, photos],
+  )
   const [index, setIndex] = useState(0)
   const [loaded, setLoaded] = useState(false)
   const [failed, setFailed] = useState(false)

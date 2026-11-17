@@ -47,7 +47,24 @@ id, categoria, modelo, anio, combustible, detalle, moneda, precio, disponible, d
 - `moneda` define el formato: `ARS` → `$ 1.200.000`, `USD` → `USD 10.500`.
 - `detalle` se muestra como etiqueta sobre la foto (por ejemplo, `No funciona`).
 - Los campos vacíos (`anio`, `combustible`, `detalle`, `descripcion`, `foto_url`) no se renderizan.
-- Las fotos siguen este orden: `foto_url` → `/fotos/{id}.webp` → placeholder.
+- Las fotos del vehículo se cargan desde `/fotos/manifest.json`; si no hay, se usa `foto_url` y por último el placeholder.
+
+## Fotos de los vehículos
+
+Las imágenes originales se guardan en `fotos-originales/<id> <modelo> <año>/` y no se suben al repositorio (están en `.gitignore`). Para publicarlas, optimizalas a WebP y generá el manifiesto:
+
+```bash
+npm run fotos
+```
+
+El script `procesar-fotos.mjs`:
+
+- Lee cada carpeta de `fotos-originales/` y ordena los archivos de forma natural.
+- Genera `/fotos/<id>/<n>.webp` (hasta 1600 px, calidad 80) y `/fotos/<id>/<n>-thumb.webp` (480 px, calidad 70) en `public/fotos/`.
+- Reescribe `public/fotos/manifest.json` con la lista de fotos de cada vehículo.
+- **Reconstruye `public/fotos/` completo en cada corrida**, así que no guardes ahí archivos que no provengan de `fotos-originales/`.
+
+Requiere `ffmpeg` disponible en el `PATH`. Si está en otra ruta, definí `FFMPEG_PATH` con la ruta al ejecutable. El script no se ejecuta automáticamente en `build`: los assets generados se versionan para poder publicar sin los originales.
 
 ## PWA y modo sin conexión
 
@@ -68,7 +85,8 @@ src/
   hooks/        Datos, filtros, tema y estado de conexión
   lib/          Formatos, WhatsApp y fotos
   styles/       Tokens y estilos por sección
-public/         Logo, iconos PWA y manifest generado en el build
+public/         Logo, iconos PWA, fotos optimizadas y manifest generado en el build
+fotos-originales/  Fotos originales (no se versionan)
 ```
 
 ## Personalización

@@ -16,6 +16,9 @@ dist-ssr
 lucian-elements.txt
 lucian-tokens.css
 
+# Fotos originales (archivos pesados)
+fotos-originales/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

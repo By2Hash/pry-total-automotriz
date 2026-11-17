@@ -16,6 +16,7 @@ export const siteConfig = {
   sucursales: [
     { nombre: 'Sucursal 1', direccion: 'Coronel Olmedo 1810' },
     { nombre: 'Sucursal 2', direccion: 'Cura Brochero 372' },
+    { nombre: 'Sucursal 3', direccion: 'Armenia 1818' },
   ],
   horarios: null,
 }
