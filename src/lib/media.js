@@ -29,6 +29,21 @@ export function normalizePhotoUrl(value) {
   return `/${raw.replace(/^\.?\//, '')}`
 }
 
+export function splitPhotoUrls(value) {
+  return String(value ?? '')
+    .split('|')
+    .map((entry) => normalizePhotoUrl(entry))
+    .filter(Boolean)
+}
+
+export function getVehiclePhotoUrls(vehicle) {
+  if (Array.isArray(vehicle?.fotoUrls) && vehicle.fotoUrls.length) {
+    return vehicle.fotoUrls
+  }
+
+  return splitPhotoUrls(vehicle?.fotoUrl)
+}
+
 export function getPhotoCandidates(vehicle, photos = []) {
   const candidates = []
 
@@ -37,7 +52,7 @@ export function getPhotoCandidates(vehicle, photos = []) {
     if (src) candidates.push(src)
   })
 
-  if (vehicle?.fotoUrl) candidates.push(vehicle.fotoUrl)
+  getVehiclePhotoUrls(vehicle).forEach((url) => candidates.push(url))
 
   if (vehicle?.id) {
     const id = encodeURIComponent(vehicle.id)
@@ -48,6 +63,14 @@ export function getPhotoCandidates(vehicle, photos = []) {
 }
 
 export function getVehiclePhotos(vehicle, photosById = {}) {
+  // Las fotos cargadas en la planilla (panel /admin) siempre tienen prioridad
+  // sobre el manifest local. El manifest queda como respaldo para los
+  // vehículos viejos que solo tienen imágenes en /public/fotos.
+  const ownPhotos = getVehiclePhotoUrls(vehicle)
+  if (ownPhotos.length) {
+    return ownPhotos.map((url) => ({ src: url, thumb: url }))
+  }
+
   const manifest = photosById?.[vehicle?.id]
 
   if (Array.isArray(manifest)) {
@@ -62,10 +85,6 @@ export function getVehiclePhotos(vehicle, photosById = {}) {
         }
       })
       .filter((photo) => photo.src)
-  }
-
-  if (vehicle?.fotoUrl) {
-    return [{ src: vehicle.fotoUrl, thumb: vehicle.fotoUrl }]
   }
 
   return []

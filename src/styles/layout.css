@@ -21,12 +21,49 @@
   display: flex;
   align-items: center;
   justify-self: start;
+  gap: 2px;
 }
 
 .navbar__right {
   display: flex;
   align-items: center;
   justify-self: end;
+}
+
+.navbar__access {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 34px;
+  padding: 0 9px;
+  border-radius: var(--radius-pill);
+  color: var(--ink-3);
+  font-size: 12px;
+  font-weight: 650;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color 0.2s var(--ease),
+    color 0.2s var(--ease);
+}
+
+.navbar__access svg {
+  font-size: 15px;
+}
+
+.navbar__access:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+@media (max-width: 639px) {
+  .navbar__access {
+    padding: 0 7px;
+  }
+
+  .navbar__access-label {
+    display: none;
+  }
 }
 
 .navbar__brand {

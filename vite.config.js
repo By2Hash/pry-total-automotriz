@@ -4,7 +4,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // Mantener en sync con el fallback de src/config.js.
 const DEFAULT_SHEET_URL =
-  'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6U3utJJBdH9PZB-cpaKQoZiMUbI_4BSfwpuDCopJ-2H-I0ZSuonKXGZa19V6PDj04YBPnfWW6_GBA/pub?output=csv'
+  'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6U3utJJBdH9PZB-cpaKQoZiMUbI_4BSfwpuDCopJ-2H-I0ZSuonKXGZa19V6PDj04YBPnfWW6_GBA/pub?output=csv&gid=2011651525'
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -59,6 +59,21 @@ export default defineConfig(({ mode }) => {
               sizes: '512x512',
               type: 'image/png',
               purpose: 'maskable',
+            },
+          ],
+          shortcuts: [
+            {
+              name: 'Cargar vehículo',
+              short_name: 'Cargar',
+              description: 'Abrir el panel para cargar un vehículo',
+              url: '/admin',
+              icons: [
+                {
+                  src: '/pwa-192x192.png',
+                  sizes: '192x192',
+                  type: 'image/png',
+                },
+              ],
             },
           ],
         },

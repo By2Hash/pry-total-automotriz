@@ -1,4 +1,4 @@
-import { normalizePhotoUrl } from '../lib/media'
+import { normalizePhotoUrl, splitPhotoUrls } from '../lib/media'
 import { normalizeText } from '../lib/format'
 
 const CANONICAL_CATEGORIES = new Map([
@@ -101,6 +101,8 @@ export function normalizeRows(rows) {
     if (seenIds.has(id)) id = `${baseId}-${index + 2}`
     seenIds.add(id)
 
+    const fotoUrls = splitPhotoUrls(row.foto_url)
+
     vehicles.push({
       id,
       categoria,
@@ -113,7 +115,8 @@ export function normalizeRows(rows) {
       precio,
       disponible: 'SI',
       descripcion: cleanText(row.descripcion),
-      fotoUrl: normalizePhotoUrl(row.foto_url),
+      fotoUrl: fotoUrls[0] || normalizePhotoUrl(row.foto_url),
+      fotoUrls,
     })
   })
 

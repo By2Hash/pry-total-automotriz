@@ -1,171 +1,55 @@
-import { spawnSync } from 'node:child_process'
-import {
-  existsSync,
-  mkdirSync,
-  readdirSync,
-  rmSync,
-  writeFileSync,
-} from 'node:fs'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import fs from 'fs';
+import path from 'path';
+import sharp from 'sharp';
 
-const rootDir = path.dirname(fileURLToPath(import.meta.url))
-const sourceDir = path.join(rootDir, 'fotos-originales')
-const outputDir = path.join(rootDir, 'public', 'fotos')
-const manifestPath = path.join(outputDir, 'manifest.json')
-const ffmpeg = process.env.FFMPEG_PATH || 'ffmpeg'
+const IN = 'fotos-originales';
+const OUT = 'public/fotos';
+const exts = ['.jpg', '.jpeg', '.png', '.webp'];
+const PORTADA = /(portada|frente|delantera)/i;
 
-const IMAGE_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp'])
-const collator = new Intl.Collator('es', { numeric: true, sensitivity: 'base' })
+// opcional: node procesar-fotos.mjs 52 12  -> solo convierte esos ids
+const soloIds = process.argv.slice(2).map(Number).filter(Boolean);
 
-function checkFfmpeg() {
-  const result = spawnSync(ffmpeg, ['-version'], { stdio: 'ignore' })
-  if (result.error || result.status !== 0) {
-    console.error(
-      'No se encontró ffmpeg. Instalalo o definí FFMPEG_PATH con la ruta al ejecutable.',
-    )
-    process.exit(1)
-  }
+function listarFotos(dir) {
+  const archivos = fs.readdirSync(dir)
+    .filter(f => exts.includes(path.extname(f).toLowerCase()))
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+  const portada = archivos.find(f => PORTADA.test(f));
+  return portada ? [portada, ...archivos.filter(f => f !== portada)] : archivos;
 }
 
-function listVehicleFolders() {
-  return readdirSync(sourceDir, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => {
-      const match = entry.name.match(/^(\d+)\s+(.+)$/)
-      if (!match) return null
-      return {
-        id: Number(match[1]),
-        name: match[2],
-        dir: path.join(sourceDir, entry.name),
-      }
-    })
-    .filter(Boolean)
-    .sort((a, b) => a.id - b.id)
-}
+const carpetas = fs.readdirSync(IN)
+  .filter(d => fs.statSync(path.join(IN, d)).isDirectory() && /^\d+/.test(d))
+  .map(d => ({ nombre: d, id: Number(d.match(/^\d+/)[0]) }))
+  .sort((a, b) => a.id - b.id);
 
-function listImages(dir) {
-  return readdirSync(dir, { withFileTypes: true })
-    .filter(
-      (entry) =>
-        entry.isFile() &&
-        IMAGE_EXTENSIONS.has(path.extname(entry.name).toLowerCase()),
-    )
-    .map((entry) => entry.name)
-    .sort((a, b) => collator.compare(a, b))
-}
+const resultado = {};
 
-function convert(input, output, width, quality) {
-  const args = [
-    '-hide_banner',
-    '-loglevel',
-    'error',
-    '-y',
-    '-i',
-    input,
-    '-vf',
-    `scale=w='min(${width},iw)':h=-2`,
-    '-c:v',
-    'libwebp',
-    '-quality',
-    String(quality),
-    '-compression_level',
-    '6',
-    '-preset',
-    'picture',
-    '-map_metadata',
-    '-1',
-    '-an',
-    output,
-  ]
+for (const { nombre, id } of carpetas) {
+  const dir = path.join(IN, nombre);
+  const fotos = listarFotos(dir);
 
-  const result = spawnSync(ffmpeg, args, { encoding: 'utf8' })
-
-  if (result.error) throw result.error
-  if (result.status !== 0) {
-    throw new Error(result.stderr?.trim() || `ffmpeg terminó con ${result.status}`)
-  }
-}
-
-if (!existsSync(sourceDir)) {
-  console.error(`No existe la carpeta ${sourceDir}.`)
-  process.exit(1)
-}
-
-checkFfmpeg()
-
-const folders = listVehicleFolders()
-if (!folders.length) {
-  console.error('No se encontraron carpetas de vehículos en fotos-originales.')
-  process.exit(1)
-}
-
-// public/fotos es una carpeta generada: se reconstruye completa en cada corrida.
-rmSync(outputDir, { recursive: true, force: true })
-mkdirSync(outputDir, { recursive: true })
-
-const manifest = {}
-let images = 0
-let emptyFolders = 0
-let errors = 0
-
-for (const vehicle of folders) {
-  const files = listImages(vehicle.dir)
-
-  if (!files.length) {
-    emptyFolders += 1
-    console.log(`— ${vehicle.id} ${vehicle.name}: sin fotos`)
-    continue
-  }
-
-  const vehicleDir = path.join(outputDir, String(vehicle.id))
-  mkdirSync(vehicleDir, { recursive: true })
-
-  const entries = []
-
-  for (const [index, file] of files.entries()) {
-    const number = index + 1
-    const largeName = `${number}.webp`
-    const thumbName = `${number}-thumb.webp`
-
-    try {
-      convert(
-        path.join(vehicle.dir, file),
-        path.join(vehicleDir, largeName),
-        1600,
-        80,
-      )
-      convert(
-        path.join(vehicle.dir, file),
-        path.join(vehicleDir, thumbName),
-        480,
-        70,
-      )
-      entries.push({
-        src: `/fotos/${vehicle.id}/${largeName}`,
-        thumb: `/fotos/${vehicle.id}/${thumbName}`,
-      })
-      images += 1
-    } catch (error) {
-      errors += 1
-      console.error(`\nError en ${vehicle.id} / ${file}: ${error.message}`)
+  if (!soloIds.length || soloIds.includes(id)) {
+    const outDir = path.join(OUT, String(id));
+    fs.rmSync(outDir, { recursive: true, force: true }); // borra lo viejo
+    if (fotos.length) fs.mkdirSync(outDir, { recursive: true });
+    let n = 1;
+    for (const f of fotos) {
+      await sharp(path.join(dir, f))
+        .rotate()
+        .resize({ width: 1200, withoutEnlargement: true })
+        .webp({ quality: 78 })
+        .toFile(path.join(outDir, `${n}.webp`));
+      n++;
     }
+    console.log(`Auto ${id}: ${fotos.length} fotos (portada: ${fotos[0] || '-'})`);
   }
 
-  if (entries.length) {
-    manifest[vehicle.id] = entries
-  }
-
-  console.log(`✓ ${vehicle.id} ${vehicle.name}: ${entries.length} fotos`)
+  resultado[id] = fotos.map((_, i) => `/fotos/${id}/${i + 1}.webp`).join('|');
 }
 
-writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`)
-
-console.log('\nResumen')
-console.log(`Vehículos con fotos: ${Object.keys(manifest).length}`)
-console.log(`Imágenes procesadas: ${images}`)
-console.log(`Carpetas sin fotos: ${emptyFolders}`)
-console.log(`Errores: ${errors}`)
-console.log(`Manifest: ${manifestPath}`)
-
-if (errors) process.exitCode = 1
+const max = Math.max(...carpetas.map(c => c.id));
+const lineas = [];
+for (let i = 1; i <= max; i++) lineas.push(resultado[i] || '');
+fs.writeFileSync('foto_url_para_pegar.txt', lineas.join('\n'));
+console.log('Listo: foto_url_para_pegar.txt');

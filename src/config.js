@@ -1,7 +1,10 @@
 const env = import.meta.env
 
 const DEFAULT_SHEET_URL =
-  'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6U3utJJBdH9PZB-cpaKQoZiMUbI_4BSfwpuDCopJ-2H-I0ZSuonKXGZa19V6PDj04YBPnfWW6_GBA/pub?output=csv'
+  'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6U3utJJBdH9PZB-cpaKQoZiMUbI_4BSfwpuDCopJ-2H-I0ZSuonKXGZa19V6PDj04YBPnfWW6_GBA/pub?output=csv&gid=2011651525'
+
+const DEFAULT_SHEET_EDIT_URL =
+  'https://docs.google.com/spreadsheets/d/1XhNbMYHfBP3tHqHpsIF_HldRLhF0aciAIjGD3bIZb7k/edit?gid=2011651525#gid=2011651525'
 
 export const siteConfig = {
   nombre: 'Total Automotriz',
@@ -23,6 +26,7 @@ export const siteConfig = {
 
 export const catalogConfig = {
   csvUrl: env.VITE_SHEET_CSV_URL || DEFAULT_SHEET_URL,
+  sheetEditUrl: env.VITE_SHEET_EDIT_URL || DEFAULT_SHEET_EDIT_URL,
   cacheVersion: 1,
   categorias: [
     'Autos y utilitarios',
