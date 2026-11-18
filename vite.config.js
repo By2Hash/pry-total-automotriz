@@ -88,11 +88,11 @@ export default defineConfig(({ mode }) => {
               urlPattern: sheetPattern,
               handler: 'NetworkFirst',
               options: {
-                cacheName: 'total-automotriz-sheet',
-                networkTimeoutSeconds: 5,
+                cacheName: 'total-automotriz-sheet-v2',
+                networkTimeoutSeconds: 10,
                 expiration: {
                   maxEntries: 1,
-                  maxAgeSeconds: 60 * 60 * 24 * 7,
+                  maxAgeSeconds: 60 * 60,
                 },
                 cacheableResponse: { statuses: [0, 200] },
               },
@@ -101,11 +101,11 @@ export default defineConfig(({ mode }) => {
               urlPattern: /\/fotos\/manifest\.json$/,
               handler: 'NetworkFirst',
               options: {
-                cacheName: 'total-automotriz-fotos-manifest',
-                networkTimeoutSeconds: 5,
+                cacheName: 'total-automotriz-fotos-manifest-v2',
+                networkTimeoutSeconds: 10,
                 expiration: {
                   maxEntries: 1,
-                  maxAgeSeconds: 60 * 60 * 24 * 7,
+                  maxAgeSeconds: 60 * 60 * 24,
                 },
                 cacheableResponse: { statuses: [0, 200] },
               },
@@ -114,10 +114,10 @@ export default defineConfig(({ mode }) => {
               urlPattern: /\/fotos\/.+\.webp$/,
               handler: 'CacheFirst',
               options: {
-                cacheName: 'total-automotriz-fotos',
+                cacheName: 'total-automotriz-fotos-v2',
                 expiration: {
                   maxEntries: 400,
-                  maxAgeSeconds: 60 * 60 * 24 * 60,
+                  maxAgeSeconds: 60 * 60 * 24 * 7,
                   purgeOnQuotaError: true,
                 },
                 cacheableResponse: { statuses: [0, 200] },

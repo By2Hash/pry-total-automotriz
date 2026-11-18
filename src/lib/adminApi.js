@@ -1,4 +1,6 @@
-const ENDPOINT = String(import.meta.env.VITE_APPS_SCRIPT_URL || '').trim()
+import { adminConfig } from '../config'
+
+const ENDPOINT = adminConfig.appsScriptUrl
 const REQUEST_TIMEOUT_MS = 25000
 
 export class AdminApiError extends Error {

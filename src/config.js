@@ -6,6 +6,13 @@ const DEFAULT_SHEET_URL =
 const DEFAULT_SHEET_EDIT_URL =
   'https://docs.google.com/spreadsheets/d/1XhNbMYHfBP3tHqHpsIF_HldRLhF0aciAIjGD3bIZb7k/edit?gid=2011651525#gid=2011651525'
 
+const DEFAULT_APPS_SCRIPT_URL =
+  'https://script.google.com/macros/s/AKfycbw-HO6uphasUDMy5djxukPcTHyseJxPa0cUf4boOy0bm391dwQ5ZRcYKfJ2_xHDoXX0Iw/exec'
+
+// El cloud name y el preset unsigned son públicos: viajan en el bundle igual.
+const DEFAULT_CLOUDINARY_CLOUD = 'psnj9pq6'
+const DEFAULT_CLOUDINARY_PRESET = 'Total_Automotriz'
+
 export const siteConfig = {
   nombre: 'Total Automotriz',
   ciudad: 'Córdoba',
@@ -27,13 +34,25 @@ export const siteConfig = {
 export const catalogConfig = {
   csvUrl: env.VITE_SHEET_CSV_URL || DEFAULT_SHEET_URL,
   sheetEditUrl: env.VITE_SHEET_EDIT_URL || DEFAULT_SHEET_EDIT_URL,
-  cacheVersion: 1,
+  cacheVersion: 2,
   categorias: [
     'Autos y utilitarios',
     'Vehículos P',
     'Motos',
     'Maquinaria y equipos',
   ],
+}
+
+export const adminConfig = {
+  appsScriptUrl: String(
+    env.VITE_APPS_SCRIPT_URL || DEFAULT_APPS_SCRIPT_URL,
+  ).trim(),
+  cloudinaryCloud: String(
+    env.VITE_CLOUDINARY_CLOUD || DEFAULT_CLOUDINARY_CLOUD,
+  ).trim(),
+  cloudinaryPreset: String(
+    env.VITE_CLOUDINARY_PRESET || DEFAULT_CLOUDINARY_PRESET,
+  ).trim(),
 }
 
 export const generalWhatsAppMessage =

@@ -1,5 +1,7 @@
-const CLOUD = String(import.meta.env.VITE_CLOUDINARY_CLOUD || '').trim()
-const PRESET = String(import.meta.env.VITE_CLOUDINARY_PRESET || '').trim()
+import { adminConfig } from '../config'
+
+const CLOUD = adminConfig.cloudinaryCloud
+const PRESET = adminConfig.cloudinaryPreset
 const UPLOAD_TIMEOUT_MS = 120000
 
 export function isCloudinaryConfigured() {

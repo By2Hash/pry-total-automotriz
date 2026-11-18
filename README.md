@@ -33,7 +33,7 @@ npm run preview
 | `VITE_SHEET_CSV_URL` | URL del Google Sheet publicado como CSV (`?output=csv&gid=…`). Conviene incluir el `gid` de la pestaña para que Google no sirva una copia vieja. |
 | `VITE_WHATSAPP_NUMBER` | Número de WhatsApp; acepta guiones o formato internacional. |
 | `VITE_INSTAGRAM_URL` | URL del perfil de Instagram. |
-| `VITE_APPS_SCRIPT_URL` | URL del Web App de Apps Script que valida la clave y recibe los vehículos del panel `/admin`. |
+| `VITE_APPS_SCRIPT_URL` | URL del Web App de Apps Script que valida la clave y recibe los vehículos del panel `/admin`. Si queda vacía se usa la URL por defecto de `src/config.js`. |
 | `VITE_SHEET_EDIT_URL` | URL de la planilla en modo edición. El panel muestra un acceso directo a Google Sheets; si queda vacía se usa la URL por defecto de `src/config.js`. |
 | `VITE_CLOUDINARY_CLOUD` | Cloud name de Cloudinary (por ejemplo, `psnj9pq6`). |
 | `VITE_CLOUDINARY_PRESET` | Upload preset **unsigned** de Cloudinary. Distingue mayúsculas y minúsculas. |
@@ -215,6 +215,13 @@ Además de compilar, el hosting debe redirigir `/admin` (y cualquier ruta de la 
 - **Netlify:** `/*  /index.html  200` en `_redirects`.
 - **Vercel:** rewrite de `/(.*)` a `/index.html`.
 - **Nginx:** `try_files $uri $uri/ /index.html;`.
+
+### Caché y actualizaciones
+
+- El service worker guarda el CSV y las fotos con nombres de caché versionados (`…-sheet-v2`, `…-fotos-v2`). Al cambiar esos nombres en `vite.config.js`, las visitas descartan el contenido viejo sin que el usuario tenga que limpiar nada.
+- La lista de vehículos también se cachea en `localStorage` con `catalogConfig.cacheVersion` (`src/config.js`). Subir ese número invalida la copia anterior.
+- El CSV se cachea 1 hora y las fotos 7 días. Las fotos subidas desde el panel tienen URL única, así que no necesitan invalidación.
+- Si se reemplazan archivos fijos de `public/fotos/` conservando el mismo nombre, conviene subir la versión de los cachés (o purgar la caché del hosting) para que no queden imágenes viejas.
 
 ## Estructura
 
