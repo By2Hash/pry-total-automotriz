@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { FaCarSide } from 'react-icons/fa6'
-import { getPhotoCandidates } from '../../lib/media'
+import { getPhotoCandidates, optimizedPhotoUrl } from '../../lib/media'
 
 export function VehicleImage({ vehicle, photos = [] }) {
   const candidates = useMemo(
@@ -12,6 +12,8 @@ export function VehicleImage({ vehicle, photos = [] }) {
   const [failed, setFailed] = useState(false)
 
   const src = candidates[index]
+    ? optimizedPhotoUrl(candidates[index], 500)
+    : undefined
   const showPlaceholder = failed || !src
 
   const label = [vehicle?.modelo, vehicle?.anio].filter(Boolean).join(' ')

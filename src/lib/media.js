@@ -29,6 +29,30 @@ export function normalizePhotoUrl(value) {
   return `/${raw.replace(/^\.?\//, '')}`
 }
 
+const CLOUDINARY_UPLOAD = '/upload/'
+
+/**
+ * Pide a Cloudinary una versión reducida de la foto (ancho + formato y calidad
+ * automáticos) sin tocar la URL guardada en la planilla.
+ * Solo actúa sobre URLs de Cloudinary; las rutas locales quedan iguales.
+ */
+export function optimizedPhotoUrl(value, width) {
+  const raw = String(value ?? '').trim()
+  if (!raw || !width) return raw
+  if (!/res\.cloudinary\.com\//i.test(raw)) return raw
+
+  const markerIndex = raw.indexOf(CLOUDINARY_UPLOAD)
+  if (markerIndex === -1) return raw
+
+  const rest = raw.slice(markerIndex + CLOUDINARY_UPLOAD.length)
+
+  // Si ya trae una transformación (w_500/..., f_auto/...), no se duplica.
+  if (/^[a-z]{1,4}_[^/]*\//i.test(rest)) return raw
+
+  const prefix = raw.slice(0, markerIndex + CLOUDINARY_UPLOAD.length)
+  return `${prefix}w_${width},f_auto,q_auto/${rest}`
+}
+
 export function splitPhotoUrls(value) {
   return String(value ?? '')
     .split('|')

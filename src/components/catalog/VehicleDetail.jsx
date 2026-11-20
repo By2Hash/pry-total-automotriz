@@ -4,11 +4,10 @@ import {
   FiChevronLeft,
   FiChevronRight,
   FiImage,
-  FiMapPin,
   FiX,
 } from 'react-icons/fi'
-import { siteConfig } from '../../config'
 import { formatPrice } from '../../lib/format'
+import { optimizedPhotoUrl } from '../../lib/media'
 import { buildVehicleWhatsAppUrl } from '../../lib/whatsapp'
 
 export function VehicleDetail({ vehicle, photos = [], onClose }) {
@@ -20,8 +19,9 @@ export function VehicleDetail({ vehicle, photos = [], onClose }) {
 
   const total = photos.length
   const current = photos[index]
-  const src = current?.src
-  const showImage = Boolean(src) && failedSrc !== src
+  const rawSrc = current?.src
+  const src = optimizedPhotoUrl(rawSrc, 1200)
+  const showImage = Boolean(rawSrc) && failedSrc !== rawSrc
   const url = buildVehicleWhatsAppUrl(vehicle)
   const meta = [vehicle.anio, vehicle.combustible].filter(Boolean)
 
@@ -50,7 +50,7 @@ export function VehicleDetail({ vehicle, photos = [], onClose }) {
     const neighbors = [photos[index + 1]?.src, photos[index - 1]?.src]
     neighbors.filter(Boolean).forEach((neighbor) => {
       const image = new Image()
-      image.src = neighbor
+      image.src = optimizedPhotoUrl(neighbor, 1200)
     })
   }, [index, photos, total])
 
@@ -118,7 +118,7 @@ export function VehicleDetail({ vehicle, photos = [], onClose }) {
                 src={src}
                 alt={`${vehicle.modelo}${vehicle.anio ? ` ${vehicle.anio}` : ''}, foto ${index + 1}`}
                 decoding="async"
-                onError={() => setFailedSrc(src)}
+                onError={() => setFailedSrc(rawSrc)}
               />
             ) : (
               <div className="vehicle-detail__photo-empty">
@@ -179,7 +179,7 @@ export function VehicleDetail({ vehicle, photos = [], onClose }) {
                   onClick={() => goTo(photoIndex)}
                 >
                   <img
-                    src={photo.thumb || photo.src}
+                    src={optimizedPhotoUrl(photo.thumb || photo.src, 300)}
                     alt=""
                     loading="lazy"
                     decoding="async"
@@ -191,23 +191,25 @@ export function VehicleDetail({ vehicle, photos = [], onClose }) {
         </div>
 
         <div className="vehicle-detail__info">
-          <p className="vehicle-detail__eyebrow">{vehicle.categoria}</p>
-          <h2 className="vehicle-detail__title" id="vehicle-detail-title">
-            {vehicle.modelo}
-          </h2>
+          <header className="vehicle-detail__header">
+            <p className="vehicle-detail__eyebrow">{vehicle.categoria}</p>
+            <h2 className="vehicle-detail__title" id="vehicle-detail-title">
+              {vehicle.modelo}
+            </h2>
 
-          {meta.length > 0 && (
-            <p className="vehicle-detail__meta">{meta.join(' · ')}</p>
-          )}
+            {meta.length > 0 && (
+              <p className="vehicle-detail__meta">{meta.join(' · ')}</p>
+            )}
+          </header>
 
           <dl className="vehicle-detail__facts">
-            <div>
+            <div className="vehicle-detail__fact">
               <dt>Condición</dt>
               <dd className={vehicle.detalle ? 'is-alert' : ''}>
                 {vehicle.detalle || 'Consultar'}
               </dd>
             </div>
-            <div>
+            <div className="vehicle-detail__fact vehicle-detail__fact--price">
               <dt>Precio</dt>
               <dd className="vehicle-detail__price">
                 {formatPrice(vehicle.precio, vehicle.moneda)}
@@ -222,31 +224,18 @@ export function VehicleDetail({ vehicle, photos = [], onClose }) {
           )}
 
           {url && (
-            <a
-              className="btn btn--whatsapp vehicle-detail__cta"
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <FaWhatsapp aria-hidden="true" />
-              Consultar por WhatsApp
-            </a>
+            <div className="vehicle-detail__actions">
+              <a
+                className="btn btn--whatsapp vehicle-detail__cta"
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <FaWhatsapp aria-hidden="true" />
+                Consultar por WhatsApp
+              </a>
+            </div>
           )}
-
-          <div className="vehicle-detail__branches">
-            <p>Sucursales</p>
-            <ul>
-              {siteConfig.sucursales.map((sucursal) => (
-                <li key={sucursal.nombre}>
-                  <FiMapPin aria-hidden="true" />
-                  <span>
-                    {sucursal.direccion}
-                    <small>{sucursal.nombre}</small>
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
         </div>
       </div>
 

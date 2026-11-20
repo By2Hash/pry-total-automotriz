@@ -1,5 +1,5 @@
-export const MAX_SIDE = 1600
-export const WEBP_QUALITY = 0.82
+export const MAX_SIDE = 1400
+export const WEBP_QUALITY = 0.78
 const MAX_INPUT_BYTES = 30 * 1024 * 1024
 
 function toWebpName(name) {

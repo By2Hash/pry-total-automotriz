@@ -19,7 +19,7 @@ export const siteConfig = {
   provincia: 'Córdoba',
   pais: 'Argentina',
   descripcion:
-    'Autos, utilitarios, motos y maquinaria. Dos sucursales en Córdoba para que puedas conocernos.',
+    'Autos, utilitarios, motos y maquinaria. Tres sucursales en Córdoba para que puedas conocernos.',
   whatsapp: env.VITE_WHATSAPP_NUMBER || '351-599-9008',
   instagram:
     env.VITE_INSTAGRAM_URL || 'https://www.instagram.com/totalautomotriz.ok/',
